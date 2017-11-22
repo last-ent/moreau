@@ -15,7 +15,8 @@ import (
 const bucketName = "www.last-ent.com"
 
 var editorHtml []byte
-var gpcAPI *gcp.GcpAPI
+var gcpAPI *gcp.GcpAPI
+var dbi *data.DBInstance
 
 func init() {
 	f, _ := os.Open("./editor.html")
@@ -27,16 +28,17 @@ func init() {
 	editorHtml = []byte(ed)
 
 	toDB := make(chan data.Essay)
+	callback := make(chan data.PubRow)
 
-	data.NewDBInstance(toDB)
-	gpcAPI = gcp.NewGcpAPI(bucketName, toDB)
+	dbi = data.NewDBInstance(toDB, callback)
+	gcpAPI = gcp.NewGcpAPI(bucketName, toDB, callback)
 }
 
 func editorHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodPost:
 		r.ParseForm()
-		go gpcAPI.UploadPost(r.Form)
+		go gcpAPI.UploadPost(r.Form)
 		http.Redirect(w, r, "/", http.StatusMovedPermanently)
 
 	case http.MethodGet:
