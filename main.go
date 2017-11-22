@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -53,10 +54,36 @@ func editorHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+const trow = `
+<li>
+	<a href="/%d"><b>%s</b></a>
+</li>`
+
+func uploadHandler(w http.ResponseWriter, r *http.Request) {
+	var buffer bytes.Buffer
+
+	for _, essay := range dbi.GetAllPublished() {
+		fmt.Println(".")
+		buffer.WriteString(fmt.Sprintf(trow, essay.PubID, essay.Title))
+	}
+
+	var body bytes.Buffer
+	body.WriteString(`<html><body>`)
+	body.WriteString(`<table>`)
+	body.WriteString(buffer.String())
+	body.WriteString(`</table>`)
+	body.WriteString(`</body></html>`)
+
+	gcp.UploadToGCP("index.html", body.String())
+	// http.Redirect(w, r, "/", http.StatusMovedPermanently)
+	w.Write([]byte("asdfasdfadfdas"))
+}
+
 func main() {
-	http.HandleFunc("/", editorHandler)
+	http.HandleFunc("/upload", uploadHandler)
 	http.HandleFunc("/editor", editorHandler)
 
+	// http.HandleFunc("/", editorHandler)
 	fmt.Println("Starting server at http://localhost:8080")
 	http.ListenAndServe(":8080", nil)
 }

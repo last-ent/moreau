@@ -18,8 +18,10 @@ type GcpAPI struct {
 	Callback   <-chan data.PubRow
 }
 
+var gcpAPI *GcpAPI
+
 func NewGcpAPI(bucketName string, dbCh chan<- data.Essay, callback <-chan data.PubRow) *GcpAPI {
-	gcpAPI := &GcpAPI{
+	gcpAPI = &GcpAPI{
 		ToDB:       dbCh,
 		Callback:   callback,
 		BucketName: bucketName,
@@ -31,24 +33,31 @@ func NewGcpAPI(bucketName string, dbCh chan<- data.Essay, callback <-chan data.P
 
 func (gcp *GcpAPI) upload() {
 	for essay := range gcp.Callback {
-		content := strings.NewReader(essay.Content)
 		object := fmt.Sprintf("%d", essay.PubID)
-		ctx := context.Background()
-		client, err := storage.NewClient(ctx)
-		if err != nil {
-			log.Fatal(err)
-		}
 
-		wc := client.Bucket(gcp.BucketName).Object(object).NewWriter(ctx)
-		var d int64
-		if d, err = io.Copy(wc, content); err != nil {
-			panic(err)
-		}
-		if err := wc.Close(); err != nil {
-			log.Fatal(err)
-		}
-		fmt.Println("Done uploading", object, d)
+		UploadToGCP(object, essay.Content)
 	}
+}
+
+func UploadToGCP(object string, c string) {
+	ctx := context.Background()
+	client, err := storage.NewClient(ctx)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(c)
+	content := strings.NewReader(c)
+
+	wc := client.Bucket(gcpAPI.BucketName).Object(object).NewWriter(ctx)
+	var d int64
+	if d, err = io.Copy(wc, content); err != nil {
+		panic(err)
+	}
+	if err := wc.Close(); err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("Done uploading", object, d)
+
 }
 
 func (gcp *GcpAPI) UploadPost(form url.Values) {
