@@ -5,18 +5,27 @@
 <form method="POST" >
     <div>
         <label for="title">Title:</label>
-        <input name="title" id="title" placeholder="Enter title..." required>
+        <input name="title" id="title" placeholder="Enter title..." required style="width:50%">
     </div>
     <br>
     <input id="content" name="content"  type="textarea" hidden/>
+
     <div id="editor" style="height:75%" ></div>
+
+    <b><label for="to_publish">Publish Essay?</label></b>
+    <select name="to_publish" id="to_publish" >
+        <option value="y">Yes</option>
+        <option value="n" selected>No</option>
+    </select>
+    <br>
+    <hr>
+
     <input type="submit" value="Submit" onclick=updateContent()>
 </form>
 <script >
     function updateContent() {
         var data = document.querySelector(".ql-editor").innerHTML;
         document.querySelector("#content").value = data;
-        console.log(data)
     }
 </script>
 
