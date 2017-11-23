@@ -34,8 +34,9 @@ func NewGcpAPI(bucketName string, dbCh chan<- data.Essay, callback <-chan data.P
 func (gcp *GcpAPI) upload() {
 	for essay := range gcp.Callback {
 		object := fmt.Sprintf("%d", essay.PubID)
+		content := fmt.Sprintf("<h1>%s</h1><br><hr><br>%s", strings.Title(essay.Title), essay.Content)
 
-		UploadToGCP(object, essay.Content)
+		UploadToGCP(object, content)
 	}
 }
 
