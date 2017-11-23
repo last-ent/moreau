@@ -1,2 +1,2 @@
-# globr
+# Moreau
 Static website generator + deployer
