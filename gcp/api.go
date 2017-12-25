@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	"cloud.google.com/go/storage"
-	"github.com/last-ent/globr/data"
+	"github.com/last-ent/moreau/data"
 )
 
 type GcpAPI struct {

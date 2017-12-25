@@ -8,8 +8,8 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/last-ent/globr/data"
-	"github.com/last-ent/globr/gcp"
+	"github.com/last-ent/moreau/data"
+	"github.com/last-ent/moreau/gcp"
 	_ "github.com/mattn/go-sqlite3"
 )
 
